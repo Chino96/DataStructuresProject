@@ -22,19 +22,23 @@ public class Search {
 		String line;
 		int count = 0;
 		while ((line = reader.readLine()) != null) {
-			String word = line.substring(0, line.indexOf(" "));
-			String deff = line.substring(line.indexOf(") ") + 2);
-			dict.setDeff(word, deff);
-			tree.add(word);
-			
-			if (!letters.containsKey(word.charAt(0))) {
-				letters.put(word.charAt(0), count);
-			}
-			count++;
+			if (!line.startsWith("-") && (line.charAt(0) - 'A') <= 26) {
+				String word = line.substring(0, line.indexOf(" "));
+				String deff = line.substring(line.indexOf(") ") + 2);
+				dict.setDeff(word, deff);
+				tree.add(word);
 
+				if (!letters.containsKey(word.charAt(0))) {
+					letters.put(word.charAt(0), count);
+					word.startsWith("i");
+					System.out.println(word + " " + count);
+				}
+				count++;
+
+			}
 		}
 
-		System.out.println(tree.root.children.get(0).children.get(0).letter);
+		System.out.println(tree.root.children.get(0).children.size());
 
 	}
 
