@@ -3,6 +3,7 @@ package project;
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -48,7 +49,7 @@ public class Search extends Application {
 
 		words.setOrientation(Orientation.VERTICAL);
 		words.setVisible(false);
-		words.setStyle("-fx-font-size: 24");
+		words.setStyle("-fx-font-size: 24; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
 		words.setLayoutX(50);
 		words.setLayoutY(130);
 		words.setPrefWidth(350);
@@ -56,7 +57,7 @@ public class Search extends Application {
 		searchBar.setLayoutX(50);
 		searchBar.setLayoutY(100);
 		searchBar.setPrefSize(350, 10);
-		searchBar.setStyle("-fx-font-size: 14");
+		searchBar.setStyle("-fx-font-size: 14; -fx-focus-color: #0076a3;");
 		searchBar.setPromptText("Enter a Word");
 
 		searchButton.setLayoutX(searchBar.getLayoutX() + 350);
@@ -75,6 +76,7 @@ public class Search extends Application {
 		stage.setScene(s);
 		stage.show();
 
+		
 		searchBar.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -83,6 +85,7 @@ public class Search extends Application {
 			}
 
 		});
+
 		searchBar.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
 			@Override
@@ -118,11 +121,51 @@ public class Search extends Application {
 							words.setVisible(false);
 						}
 					}
+				} else if (searchBar.getText().length() > 0 && key.getCode().equals(KeyCode.DOWN)) {
+
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							words.getSelectionModel().selectNext();
+							words.getFocusModel().focus(0);
+							words.requestFocus();
+						}
+					});
 				}
 
 				else if (key.getCode().equals(KeyCode.BACK_SPACE)) {
 					output.setVisible(false);
 				}
+			}
+
+		});
+
+		words.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent key) {
+				if (key.getCode().equals(KeyCode.ENTER)) {
+					words.setVisible(false);
+					try {
+						String deff = dict.getDeff(words.getItems().get(0));
+						output.setText(words.getSelectionModel().getSelectedItem() + " - " + deff);
+						output.setVisible(true);
+						searchBar.setText(words.getSelectionModel().getSelectedItem());
+					} catch (IndexOutOfBoundsException e) {
+						words.setVisible(false);
+					}
+
+				}
+				
+				else if(key.getCode().equals(KeyCode.UP) && words.getSelectionModel().getSelectedItem().equals(words.getItems().get(0))) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							searchBar.requestFocus();
+						}
+					});
+				}
+
 			}
 
 		});
@@ -151,7 +194,6 @@ public class Search extends Application {
 			}
 
 		});
-
 	}
 
 }
